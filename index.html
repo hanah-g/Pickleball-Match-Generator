@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pickleball Match Generator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1>Pickleball Match Generator</h1>
+
+  <section>
+    <h2>Players</h2>
+    <input id="player-input" type="text" placeholder="Player name" />
+    <button id="add-player">Add Player</button>
+
+    <div id="player-list"></div>
+  </section>
+
+  <section>
+    <h2>Setup</h2>
+    <label>
+      Courts:
+      <input id="court-count" type="number" min="1" value="3" />
+    </label>
+    <button id="generate-round">Generate Round</button>
+  </section>
+
+  <section>
+    <h2>Rounds</h2>
+    <div id="rounds"></div>
+  </section>
+
+  <section>
+    <h2>Win Counts</h2>
+    <div id="wins"></div>
+    <button id="export">Export</button>
+    <textarea id="export-output"></textarea>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
