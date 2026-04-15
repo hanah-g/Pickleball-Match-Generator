@@ -99,14 +99,14 @@ function showRounds() {
       }
       btnA.onclick = e => {
         e.stopPropagation();
-        btnA.classList.add("winner");
-        btnB.classList.add("winner");
+        //btnA.classList.add("winner");
+        //btnB.classList.add("winner");
         recordWin(court, "A");
       };
       btnB.onclick = e => {
         e.stopPropagation();
-        btnA.classList.add("winner");
-        btnB.classList.add("winner");
+        //btnA.classList.add("winner");
+        //btnB.classList.add("winner");
         recordWin(court, "B");
       };
       cDiv.appendChild(btnA);
