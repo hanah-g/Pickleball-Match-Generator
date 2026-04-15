@@ -3,6 +3,8 @@ body {
     padding: 20px;
     background: #fff7f2;
     color: #333;
+    font-size: 18px;
+    line-height: 1.4;
 }
   
 h1, h2 {
@@ -29,13 +31,14 @@ section {
   
 button {
     margin-left: 6px;
-    padding: 4px 10px;
+    padding: 10px 16px; 
     background: #e85a32;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     transition: 0.2s;
+    font-size: 18px;
 }
   
 textarea {
@@ -79,13 +82,22 @@ button.winner {
 @media (max-width: 600px) {
     body {
         padding: 12px;
+        font-size: 20px;
     }
     button {
-        margin-top: 6px;
+        margin: 8px 0;
         width: 100%;
+        padding: 14px;
+        font-size: 20px;
     }
     #player-list div {
         display: block;
         width: 100%;
+        padding: 10px;
+        font-size: 18px;
+    }
+    #rounds div {
+        padding: 16px;
+        font-size: 20px;
     }
 }
