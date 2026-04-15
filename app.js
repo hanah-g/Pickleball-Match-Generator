@@ -18,105 +18,51 @@ function addPlayer() {
 
 $("add-player").onclick = addPlayer;
 
-//list players
-function listPlayers() {
-  const list = $("player-list");
-  list.innerHTML = "";
-  players.forEach(p => {
-    const div = document.createElement("div");
-    div.textContent = `${p.name} (${p.wins})`;
-    const remove = document.createElement("button");
-    remove.textContent = "×";
-    remove.onclick = () => {
-      players = players.filter(x => x.id !== p.id);
-      listPlayers();
-      updateWins();
-    };
-    div.appendChild(remove);
-    list.appendChild(div);
-  });
-}
-
-//shuffle helper
-function shuffle(arr) {
-  return arr
-    .map(x => ({ x, r: Math.random() }))
-    .sort((a, b) => a.r - b.r)
-    .map(o => o.x);
-}
-
-//generate a round
-function generateRound() {
-  const courts = parseInt($("court-count").value);
-  const maxPlayers = courts * 4;
-  const shuffled = shuffle(players.map(p => p.id));
-  const used = shuffled.slice(0, maxPlayers);
-  const sittingOut = shuffled.slice(maxPlayers);
-  const round = [];
-  let idx = 0;
-  for (let c = 0; c < courts; c++) {
-      round.push({
-        court: c + 1,
-        team1: used.slice(idx, idx + 2),
-        team2: used.slice(idx + 2, idx + 4),
-        winner: null
-      });
-    idx += 4;
-  }
-  rounds.push({
-    courts: round,
-    sittingOut: sittingOut
-  });
-  showRounds();
-}
-
-$("generate-round").onclick = generateRound;
-
 //list rounds
 function showRounds() {
-  const container = $("rounds");
-  container.innerHTML = "";
-  rounds.forEach((round, rIndex) => {
-    const div = document.createElement("div");
-    div.innerHTML = `<h3>Round ${rIndex + 1}</h3>`;
-    round.forEach(court => {
-      const cDiv = document.createElement("div");
-      cDiv.innerHTML = `
-        <strong>Court ${court.court}</strong><br>
-        Team A: ${court.team1.map(id => players.find(p => p.id === id).name).join(", ")}<br>
-        Team B: ${court.team2.map(id => players.find(p => p.id === id).name).join(", ")}<br>
-      `;
-      const btnA = document.createElement("button");
-      btnA.textContent = "Team A Win";
-      const btnB = document.createElement("button");
-      btnB.textContent = "Team B Win";
-      //lock after winning so teams can't both win or win more than once
-      if (court.winner) {
-        btnA.disabled = true;
-        btnB.disabled = true;
-      }
-      btnA.onclick = e => {
-        e.stopPropagation();
-        recordWin(court, "A");
-      };
-      btnB.onclick = e => {
-        e.stopPropagation();
-        recordWin(court, "B");
-      };
-      cDiv.appendChild(btnA);
-      cDiv.appendChild(btnB);
-      div.appendChild(cDiv);
-    });
-    if (round.sittingOut.length > 0) {
+    const container = $("rounds");
+    container.innerHTML = "";
+    rounds.forEach((round, rIndex) => {
+      const div = document.createElement("div");
+      div.innerHTML = `<h3>Round ${rIndex + 1}</h3>`;
+      round.courts.forEach(court => {
+        const cDiv = document.createElement("div");
+        cDiv.innerHTML = `
+          <strong>Court ${court.court}</strong><br>
+          Team A: ${court.team1.map(id => players.find(p => p.id === id).name).join(", ")}<br>
+          Team B: ${court.team2.map(id => players.find(p => p.id === id).name).join(", ")}<br>
+        `;
+        const btnA = document.createElement("button");
+        btnA.textContent = "Team A Win";
+        const btnB = document.createElement("button");
+        btnB.textContent = "Team B Win";
+        //lock after winning so teams can't both win or win more than once
+        if (court.winner) {
+          btnA.disabled = true;
+          btnB.disabled = true;
+        }
+        btnA.onclick = e => {
+          e.stopPropagation();
+          recordWin(court, "A");
+        };
+        btnB.onclick = e => {
+          e.stopPropagation();
+          recordWin(court, "B");
+        };
+        cDiv.appendChild(btnA);
+        cDiv.appendChild(btnB);
+        div.appendChild(cDiv);
+      });
+      if (round.sittingOut.length > 0) {
         const sitDiv = document.createElement("div");
         sitDiv.innerHTML = `
           <em>Sitting Out:</em> 
           ${round.sittingOut.map(id => players.find(p => p.id === id).name).join(", ")}`;
         div.appendChild(sitDiv);
-    }
-    container.appendChild(div);
-  });
-}
+      }
+      container.appendChild(div);
+    });
+} 
 
 //record a win
 function recordWin(court, winner) {
