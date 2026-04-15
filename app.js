@@ -126,6 +126,14 @@ function recordWin(court, winner) {
   listPlayers();
   updateWins();
   showRounds();
+  const roundDivs = document.querySelectorAll("#rounds > div");
+  const lastRound = roundDivs[roundDivs.length - 1];
+  const buttons = lastRound.querySelectorAll("button");
+  buttons.forEach(btn => {
+    if (btn.textContent.includes(winner === "A" ? "Team A" : "Team B")) {
+      btn.classList.add("winner");
+    }
+  });
 }
 
 //update win leaderboard

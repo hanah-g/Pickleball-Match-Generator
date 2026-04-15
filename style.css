@@ -48,6 +48,12 @@ button:hover {
     background: #d6452f;
 }
 
+button.winner {
+    background: #b83e22;
+    opacity: 0.6;
+    cursor: default;
+}
+
 /* player names */
 #player-list div {
     background: #ffe1d6;
