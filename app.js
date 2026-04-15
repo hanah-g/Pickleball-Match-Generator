@@ -97,10 +97,14 @@ function showRounds() {
       }
       btnA.onclick = e => {
         e.stopPropagation();
+        btnA.classList.add("winner");
+        btnB.classList.add("winner");
         recordWin(court, "A");
       };
       btnB.onclick = e => {
         e.stopPropagation();
+        btnA.classList.add("winner");
+        btnB.classList.add("winner");
         recordWin(court, "B");
       };
       cDiv.appendChild(btnA);
@@ -126,14 +130,14 @@ function recordWin(court, winner) {
   listPlayers();
   updateWins();
   showRounds();
-  const roundDivs = document.querySelectorAll("#rounds > div");
+  /*const roundDivs = document.querySelectorAll("#rounds > div");
   const lastRound = roundDivs[roundDivs.length - 1];
   const buttons = lastRound.querySelectorAll("button");
   buttons.forEach(btn => {
     if (btn.textContent.includes(winner === "A" ? "Team A" : "Team B")) {
       btn.classList.add("winner");
     }
-  });
+  });*/
 }
 
 //update win leaderboard
