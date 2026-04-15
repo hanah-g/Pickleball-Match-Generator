@@ -51,18 +51,22 @@ function generateRound() {
   const maxPlayers = courts * 4;
   const shuffled = shuffle(players.map(p => p.id));
   const used = shuffled.slice(0, maxPlayers);
+  const sittingOut = shuffled.slice(maxPlayers);
   const round = [];
   let idx = 0;
   for (let c = 0; c < courts; c++) {
-    round.push({
-      court: c + 1,
-      team1: used.slice(idx, idx + 2),
-      team2: used.slice(idx + 2, idx + 4),
-      winner: null
-    });
+      round.push({
+        court: c + 1,
+        team1: used.slice(idx, idx + 2),
+        team2: used.slice(idx + 2, idx + 4),
+        winner: null
+      });
     idx += 4;
   }
-  rounds.push(round);
+  rounds.push({
+    courts: round,
+    sittingOut: sittingOut
+  });
   showRounds();
 }
 
@@ -103,6 +107,13 @@ function showRounds() {
       cDiv.appendChild(btnB);
       div.appendChild(cDiv);
     });
+    if (round.sittingOut.length > 0) {
+        const sitDiv = document.createElement("div");
+        sitDiv.innerHTML = `
+          <em>Sitting Out:</em> 
+          ${round.sittingOut.map(id => players.find(p => p.id === id).name).join(", ")}`;
+        div.appendChild(sitDiv);
+    }
     container.appendChild(div);
   });
 }
