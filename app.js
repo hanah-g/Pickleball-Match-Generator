@@ -94,6 +94,8 @@ function showRounds() {
       if (court.winner) {
         btnA.disabled = true;
         btnB.disabled = true;
+        btnA.classList.add("winner");
+        btnB.classList.add("winner");
       }
       btnA.onclick = e => {
         e.stopPropagation();
