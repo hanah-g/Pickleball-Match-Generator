@@ -23,13 +23,13 @@ $("add-player").onclick = addPlayer;
 function listPlayers() {
   const list = $("player-list");
   list.innerHTML = "";
-  players.forEach(p => {
+  players.filter(p => !p.removed).forEach(p => {
     const div = document.createElement("div");
     div.textContent = `${p.name} (${p.wins})`;
     const remove = document.createElement("button");
     remove.textContent = "×";
     remove.onclick = () => {
-      players = players.filter(x => x.id !== p.id);
+      p.removed = true;
       listPlayers();
       updateWins();
       updatePlayerCount();
@@ -51,7 +51,7 @@ function shuffle(arr) {
 function generateRound() {
   const courts = parseInt($("court-count").value);
   const maxPlayers = courts * 4;
-  const shuffled = shuffle(players.map(p => p.id));
+  const shuffled = shuffle(players.filter(p => !p.removed).map(p => p.id));
   const used = shuffled.slice(0, maxPlayers);
   const sittingOut = shuffled.slice(maxPlayers);
   const round = [];
