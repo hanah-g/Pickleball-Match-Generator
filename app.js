@@ -83,8 +83,8 @@ function showRounds() {
       const cDiv = document.createElement("div");
       cDiv.innerHTML = `
         <strong>Court ${court.court}</strong><br>
-        Team A: ${court.team1.map(id => players.find(p => p.id === id).name).join(", ")}<br>
-        Team B: ${court.team2.map(id => players.find(p => p.id === id).name).join(", ")}<br>
+        Team A: ${court.team1.map(id => players.find(p => p.id === id)?.name || "(removed)").join(", ")}<br>
+        Team B: ${court.team2.map(id => players.find(p => p.id === id)?.name || "(removed)").join(", ")}<br>
       `;
       const btnA = document.createElement("button");
       btnA.textContent = "Team A Win";
@@ -115,9 +115,7 @@ function showRounds() {
     });
     if (round.sittingOut.length > 0) {
         const sitDiv = document.createElement("div");
-        sitDiv.innerHTML = `
-          <em>Sitting Out:</em> 
-          ${round.sittingOut.map(id => players.find(p => p.id === id).name).join(", ")}`;
+        sitDiv.innerHTML = `${round.sittingOut.map(id => players.find(p => p.id === id)?.name || "(removed)").join(", ")}`;
         div.appendChild(sitDiv);
     }
     container.appendChild(div);
@@ -164,4 +162,8 @@ function exportEnd() {
 }
 
 $("export").onclick = exportEnd;
-//NEED TO: STYLE, FIX EXPORT (TXT FILE?)
+
+
+
+//NEED TO:
+// FIX EXPORT (TXT FILE?), FIX BREAK WHEN PLAYER LEAVES, ADD SHUFFLE FEATURE, ADD EDIT TEAMS FEATURE (?), ADD TRY TO SHUFFLE PLAYERS AS MUCH AS POSSIBLE?
