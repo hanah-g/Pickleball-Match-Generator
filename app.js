@@ -14,6 +14,7 @@ function addPlayer() {
   $("player-input").value = "";
   listPlayers();
   updateWins();
+  updatePlayerCount();
 }
 
 $("add-player").onclick = addPlayer;
@@ -31,6 +32,7 @@ function listPlayers() {
       players = players.filter(x => x.id !== p.id);
       listPlayers();
       updateWins();
+      updatePlayerCount();
     };
     div.appendChild(remove);
     list.appendChild(div);
@@ -153,6 +155,11 @@ function updateWins() {
       container.appendChild(div);
     });
 }
+
+//want to add number of plauers since i had to keep counting
+function updatePlayerCount() {
+    $("player-count").textContent = `Players: ${players.length}`;
+  }  
 
 //Export
 function exportEnd() {
