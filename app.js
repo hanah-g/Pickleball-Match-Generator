@@ -47,6 +47,24 @@ function shuffle(arr) {
     .map(o => o.x);
 }
 
+function shufflePlayers(round) {
+    //only shuffle if NO court has a winner
+    if (round.courts.some(c => c.winner)) return;
+    const all = [];
+    round.courts.forEach(c => {
+      all.push(...c.team1, ...c.team2);
+    });
+    const shuffled = shuffle(all);
+    // Reassign teams of 2 per court
+    let idx = 0;
+    round.courts.forEach(c => {
+      c.team1 = shuffled.slice(idx, idx + 2);
+      c.team2 = shuffled.slice(idx + 2, idx + 4);
+      idx += 4;
+    });
+    showRounds();
+  }
+
 //generate a round
 function generateRound() {
   const courts = parseInt($("court-count").value);
@@ -81,6 +99,12 @@ function showRounds() {
   rounds.forEach((round, rIndex) => {
     const div = document.createElement("div");
     div.innerHTML = `<h3>Round ${rIndex + 1}</h3>`;
+    if (!round.courts.some(c => c.winner)) {
+        const shuffleAllBtn = document.createElement("button");
+        shuffleAllBtn.textContent = "Shuffle All Teams";
+        shuffleAllBtn.onclick = () => shuffleEntireRound(round);
+        div.appendChild(shuffleAllBtn);
+    }
     round.courts.forEach(court => {
       const cDiv = document.createElement("div");
       cDiv.innerHTML = `
