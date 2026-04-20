@@ -102,7 +102,7 @@ function showRounds() {
     if (!round.courts.some(c => c.winner)) {
         const shuffleAllBtn = document.createElement("button");
         shuffleAllBtn.textContent = "Shuffle All Teams";
-        shuffleAllBtn.onclick = () => shuffleEntireRound(round);
+        shuffleAllBtn.onclick = () => shufflePlayers(round);
         div.appendChild(shuffleAllBtn);
     }
     round.courts.forEach(court => {
