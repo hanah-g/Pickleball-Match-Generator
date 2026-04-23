@@ -9,7 +9,7 @@ function addPlayer() {
   if (!input) return;
   input.split(",").forEach(name => {
     name = name.trim();
-    if (name) players.push({ id: nextPlayerId++, name, wins: 0 });
+    if (name) players.push({ id: nextPlayerId++, name, wins: 0, satOut: 0, removed: false });
   });
   $("player-input").value = "";
   listPlayers();
@@ -25,7 +25,7 @@ function listPlayers() {
   list.innerHTML = "";
   players.filter(p => !p.removed).forEach(p => {
     const div = document.createElement("div");
-    div.textContent = `${p.name} (${p.wins})`;
+    div.textContent = `${p.name} (${p.wins} wins, ${p.satOut} sit-outs)`;
     const remove = document.createElement("button");
     remove.textContent = "×";
     remove.onclick = () => {
@@ -69,9 +69,34 @@ function shufflePlayers(round) {
 function generateRound() {
   const courts = parseInt($("court-count").value);
   const maxPlayers = courts * 4;
-  const shuffled = shuffle(players.filter(p => !p.removed).map(p => p.id));
-  const used = shuffled.slice(0, maxPlayers);
-  const sittingOut = shuffled.slice(maxPlayers);
+  //fair sit outs
+  const active = players.filter(p => !p.removed);
+  //Group players by number of times they have sat out
+  const groups = {};
+  active.forEach(p => {
+    if (!groups[p.satOut]) groups[p.satOut] = [];
+    groups[p.satOut].push(p);
+  });
+  const sortedCounts = Object.keys(groups).map(Number).sort((a, b) => b - a);
+  const playing = [];
+  const sitting = [];
+  //Fill PLAYING slots from highest satOut groups
+  for (const count of sortedCounts) {
+   const group = shuffle(groups[count]); // randomize within group
+   for (const p of group) {
+     if (playing.length < maxPlayers) {
+       playing.push(p);
+     } else {
+       sitting.push(p);
+     }
+   }
+  }
+  sitting.forEach(p => p.satOut++);
+  const shuffled = shuffle(playing.map(p => p.id));
+  const used = shuffled;
+  const sittingOut = sitting.map(p => p.id);
+
+  //no change
   const round = [];
   let idx = 0;
   for (let c = 0; c < courts; c++) {
@@ -141,7 +166,12 @@ function showRounds() {
     });
     if (round.sittingOut.length > 0) {
         const sitDiv = document.createElement("div");
-        sitDiv.innerHTML = `${round.sittingOut.map(id => players.find(p => p.id === id)?.name || "(removed)").join(", ")}`;
+        sitDiv.innerHTML = round.sittingOut
+            .map(id => {
+            const p = players.find(p => p.id === id);
+            return `${p.name} (${p.satOut} sit-outs)`;
+        })
+        .join(", ");
         div.appendChild(sitDiv);
     }
     container.appendChild(div);
@@ -175,20 +205,20 @@ function updateWins() {
     .sort((a, b) => b.wins - a.wins)
     .forEach(p => {
       const div = document.createElement("div");
-      div.textContent = `${p.name}: ${p.wins}`;
+      div.textContent = `${p.name}: ${p.wins} wins, ${p.satOut} sit-outs`;
       container.appendChild(div);
     });
 }
 
 //want to add number of plauers since i had to keep counting
 function updatePlayerCount() {
-    $("player-count").textContent = `Players: ${players.length}`;
+    $("player-count").textContent = `Players: ${players.filter(p => !p.removed).length}`;
   }  
 
 //Export
 function exportEnd() {
   $("export-output").value = players
-    .map(p => `${p.name}: ${p.wins}`)
+    .map(p => `${p.name}: ${p.wins} wins, ${p.satOut} sit-outs`) 
     .join("\n");
 }
 
