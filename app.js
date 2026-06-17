@@ -9,7 +9,16 @@ function addPlayer() {
   if (!input) return;
   input.split(",").forEach(name => {
     name = name.trim();
-    if (name) players.push({ id: nextPlayerId++, name, wins: 0, satOut: 0, removed: false });
+    if (name) players.push({
+        id: nextPlayerId++,
+        name,
+        wins: 0,
+        satOut: 0,
+        removed: false,
+        playedWith: {},
+        playedAgainst: {},
+        playedSameCourt: {}
+      });
   });
   $("player-input").value = "";
   listPlayers();
@@ -65,6 +74,78 @@ function shufflePlayers(round) {
     showRounds();
   }
 
+//history
+function updateHistory(round) {
+  round.courts.forEach(court => {
+    const A = court.team1;
+    const B = court.team2;
+    const all = [...A, ...B];
+
+    // teammates
+    A.forEach(id1 => A.forEach(id2 => {
+      if (id1 !== id2) {
+        players.find(p => p.id === id1).playedWith[id2] =
+          (players.find(p => p.id === id1).playedWith[id2] || 0) + 1;
+      }
+    }));
+    B.forEach(id1 => B.forEach(id2 => {
+      if (id1 !== id2) {
+        players.find(p => p.id === id1).playedWith[id2] =
+          (players.find(p => p.id === id1).playedWith[id2] || 0) + 1;
+      }
+    }));
+
+    // opponents
+    A.forEach(id1 => B.forEach(id2 => {
+      players.find(p => p.id === id1).playedAgainst[id2] =
+        (players.find(p => p.id === id1).playedAgainst[id2] || 0) + 1;
+      players.find(p => p.id === id2).playedAgainst[id1] =
+        (players.find(p => p.id === id2).playedAgainst[id1] || 0) + 1;
+    }));
+
+    // same court
+    all.forEach(id1 => all.forEach(id2 => {
+      if (id1 !== id2) {
+        players.find(p => p.id === id1).playedSameCourt[id2] =
+          (players.find(p => p.id === id1).playedSameCourt[id2] || 0) + 1;
+      }
+    }));
+  });
+}
+
+//helper
+function scoreTeams(p1, p2, p3, p4) {
+  const get = (obj, key) => obj[key] || 0;
+
+  const P = players;
+
+  function teamScore(a, b, c, d) {
+    return (
+      get(P.find(p => p.id === a).playedWith, b) +
+      get(P.find(p => p.id === c).playedWith, d) +
+      get(P.find(p => p.id === a).playedAgainst, c) +
+      get(P.find(p => p.id === a).playedAgainst, d) +
+      get(P.find(p => p.id === b).playedAgainst, c) +
+      get(P.find(p => p.id === b).playedAgainst, d) +
+      get(P.find(p => p.id === a).playedSameCourt, b) +
+      get(P.find(p => p.id === a).playedSameCourt, c) +
+      get(P.find(p => p.id === a).playedSameCourt, d) +
+      get(P.find(p => p.id === b).playedSameCourt, c) +
+      get(P.find(p => p.id === b).playedSameCourt, d) +
+      get(P.find(p => p.id === c).playedSameCourt, d)
+    );
+  }
+
+  const options = [
+    { teams: [[p1, p2], [p3, p4]], score: teamScore(p1, p2, p3, p4) },
+    { teams: [[p1, p3], [p2, p4]], score: teamScore(p1, p3, p2, p4) },
+    { teams: [[p1, p4], [p2, p3]], score: teamScore(p1, p4, p2, p3) }
+  ];
+
+  options.sort((a, b) => a.score - b.score);
+  return options[0].teams;
+}
+
 //generate a round
 function generateRound() {
   const courts = parseInt($("court-count").value);
@@ -100,12 +181,17 @@ function generateRound() {
   const round = [];
   let idx = 0;
   for (let c = 0; c < courts; c++) {
-      round.push({
-        court: c + 1,
-        team1: used.slice(idx, idx + 2),
-        team2: used.slice(idx + 2, idx + 4),
-        winner: null
-      });
+    const p1 = used[idx];
+    const p2 = used[idx + 1];
+    const p3 = used[idx + 2];
+    const p4 = used[idx + 3];
+    const [teamA, teamB] = scoreTeams(p1, p2, p3, p4);
+    round.push({
+      court: c + 1,
+      team1: teamA,
+      team2: teamB,
+      winner: null
+    });
     idx += 4;
   }
   rounds.push({
@@ -113,6 +199,7 @@ function generateRound() {
     sittingOut: sittingOut
   });
   showRounds();
+  updateHistory(rounds[rounds.length - 1]);
 }
 
 $("generate-round").onclick = generateRound;
